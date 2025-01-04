@@ -9,8 +9,8 @@
                 "/EHsc",
                 "/nologo",
                 "/O2",
-                "/Fe${workspaceFolder}\\${fileBasenameNoExtension}.exe",
-                "${workspaceFolder}\\src\\*.c",
+                "/Fe${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "${fileDirname}\\*.c",
             ],
             "options": {
                 "cwd": "${fileDirname}"

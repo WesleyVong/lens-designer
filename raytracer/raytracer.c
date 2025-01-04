@@ -1,6 +1,13 @@
 #include "raytracer.h"
 #include "math.h"
-#include "physics.h"
+
+double lambert(vec3 normal, vec3 light_dir){
+    double lambert = vec3_dot(normal, light_dir);
+    if (lambert < 0){
+        lambert = 0;
+    }
+    return lambert;
+}
 
 intersection ray_intersect_nearest(raytracer * rt, ray * r);
 void raytrace(raytracer * rt, ray * r);
