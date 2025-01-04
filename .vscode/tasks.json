@@ -8,9 +8,9 @@
                 "/Zi",
                 "/EHsc",
                 "/nologo",
-                "/Fe${fileDirname}\\${fileBasenameNoExtension}.exe",
-                // Gets all files in directory
-                "${fileDirname}\\*.c",
+                "/O2",
+                "/Fe${workspaceFolder}\\${fileBasenameNoExtension}.exe",
+                "${workspaceFolder}\\src\\*.c",
             ],
             "options": {
                 "cwd": "${fileDirname}"

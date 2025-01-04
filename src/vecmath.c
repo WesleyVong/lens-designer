@@ -1,6 +1,56 @@
 #include "vecmath.h"
 #include "math.h"
 
+// Vector 2D functions
+
+vec2 vec2_add(vec2 a, vec2 b){
+    vec2 result = {a.x + b.x, a.y + b.y};
+    return result;
+}
+
+vec2 vec2_sub(vec2 a, vec2 b){
+    vec2 result = {a.x - b.x, a.y - b.y};
+    return result;
+}
+
+vec2 vec2_mul(vec2 a, double b){
+    vec2 result = {a.x * b, a.y * b};
+    return result;
+}
+
+vec2 vec2_div(vec2 a, double b){
+    vec2 result = {a.x / b, a.y / b};
+    return result;
+}
+
+vec2 vec2_neg(vec2 a){
+    vec2 result = {-a.x, -a.y};
+    return result;
+}
+
+vec2 vec2_vec2_mul(vec2 a, vec2 b){
+    vec2 result = {a.x * b.x, a.y * b.y};
+    return result;
+}
+
+double vec2_dot(vec2 a, vec2 b){
+    return a.x * b.x + a.y * b.y;
+}
+
+double vec2_length(vec2 a){
+    return sqrt(a.x * a.x + a.y * a.y);
+}
+
+double vec2_length_squared(vec2 a){
+    return a.x * a.x + a.y * a.y;
+}
+
+vec2 vec2_normalize(vec2 a){
+    return vec2_div(a, vec2_length(a));
+}
+
+// Vector 3D functions
+
 vec3 vec3_add(vec3 a, vec3 b){
     vec3 result = {a.x + b.x, a.y + b.y, a.z + b.z};
     return result;
