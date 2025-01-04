@@ -57,7 +57,7 @@ int main(){
 
 
     // Save to PNG using lodepng
-    lodepng_encode32_file("blank.png", image, width, height);
+    lodepng_encode32_file("3d.png", image, width, height);
     // Free memory
     raytrace_free(&rt);
     free(image);
