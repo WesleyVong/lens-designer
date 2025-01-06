@@ -49,6 +49,11 @@ vec2 vec2_normalize(vec2 a){
     return vec2_div(a, vec2_length(a));
 }
 
+vec2 vec2_round(vec2 a){
+    vec2 result = {round(a.x), round(a.y)};
+    return result;
+}
+
 // Vector 3D functions
 
 vec3 vec3_add(vec3 a, vec3 b){
@@ -100,4 +105,9 @@ double vec3_length_squared(vec3 a){
 
 vec3 vec3_normalize(vec3 a){
     return vec3_div(a, vec3_length(a));
+}
+
+vec3 vec3_round(vec3 a){
+    vec3 result = {round(a.x), round(a.y), round(a.z)};
+    return result;
 }

@@ -2,6 +2,7 @@
 #define RAY2D_H
 
 #include "vecmath.h"
+#include "color.h"
 
 typedef enum {
     RAY_PRIMARY,
@@ -15,51 +16,47 @@ typedef enum {
     INTERSECT_EXTERIOR, // Ray intersects with outside face of object
 } Intersect2dType;
 
-typedef enum {
-    OBJECT_LINE,
-    OBJECT_PARAMETRIC
-} Object2dType;
-
-// TODO: Support wavelength based colors. Currently split RGB to three channels
-typedef struct {
-    vec3 color;
-    double shininess;
-} material2d;
-
-typedef struct {
-    Object2dType type;
-    long id;
-    void * geometry;
-    material2d * mat;
-} object2d;
-
 typedef struct {
     Intersect2dType type;
     vec2 point;
     vec2 normal;
     double distance;   // The distance along the ray to the intersection point
-    material2d * mat;       // Material that the ray intersects with
-    object2d * obj;
-} intersection2d;
+} Intersection2d;
 
-typedef struct ray2d ray2d;
+typedef struct {
+    Color diffuse;
+    double shininess;
+    double transparency;
+} Material;
 
-struct ray2d {
+typedef struct {
+    long id;
+    char * name;
+    Material * mat;
+    vec2 (*get_point)(void * obj, double t);    // The shape of the object should be defined for 0 <= t <= 1
+    Intersection2d (*get_intersection)(void * obj, struct ray2d * r);
+} Object2d;
+
+typedef struct Ray2d Ray2d;
+
+struct Ray2d {
     Ray2dType type;
     vec2 origin;
     vec2 direction;
     long bounces;
     double wavelength;
     double intensity;
-    intersection2d * intersection;
+
+    Intersection2d * intersection;
     long reflected_rays_num;
-    ray2d * reflected_rays;
+    Ray2d * reflected_rays;
     long refracted_rays_num;
-    ray2d * refracted_rays;
+    Ray2d * refracted_rays;
 };
 
-void ray2d_init(ray2d * r);
-void intersection2d_init(intersection2d * i);
-void ray2d_free(ray2d * r);
+Intersection2d * intersection2d_init(Intersect2dType type, vec2 point, vec2 normal, double distance);
+void intersection2d_free(Intersection2d * i);
+Ray2d * ray2d_init(Ray2dType type, vec2 origin, vec2 direction, double wavelength, double intensity);
+void ray2d_free(Ray2d * r);
 
 #endif

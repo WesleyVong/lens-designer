@@ -1,34 +1,34 @@
 #include "ray2d.h"
 
-void ray2d_init(ray2d * r){
-    r->type = RAY_PRIMARY;
-    r->origin = (vec2){0, 0};
-    r->direction = (vec2){0, 0};
-    r->bounces = 0;
-    r->wavelength = 0;
-    r->intensity = 1;
-    r->intersection = NULL;
+Ray2d * ray2d_init(Ray2dType type, vec2 origin, vec2 direction, double wavelength, double intensity){
+    Ray2d * r = (Ray2d *)malloc(sizeof(Ray2d));
+    r->type = type;
+    r->origin = origin;
+    r->direction = vec2_normalize(direction);
+    r->wavelength = wavelength;
+    r->intensity = intensity;
+    r->intersection = intersection2d_init(INTERSECT_NONE, (vec2){0, 0}, (vec2){0, 0}, 0);
     r->reflected_rays_num = 0;
     r->reflected_rays = NULL;
     r->refracted_rays_num = 0;
     r->refracted_rays = NULL;
+    return r;
 }
-void intersection2d_init(intersection2d * i){
-    i->type = INTERSECT_NONE;
-    i->point = (vec2){0, 0};
-    i->normal = (vec2){0, 0};
-    i->distance = 0;
-    i->mat = NULL;
-    i->obj = NULL;
+
+Intersection2d * intersection2d_init(Intersect2dType type, vec2 point, vec2 normal, double distance){
+    Intersection2d * i = (Intersection2d *)malloc(sizeof(Intersection2d));
+    i->type = type;
+    i->point = point;
+    i->normal = normal;
+    i->distance = distance;
+    return i;
 }
-void ray2d_free(ray2d * r){
-    if (r->intersection != NULL){
-        free(r->intersection);
-    }
-    if (r->reflected_rays != NULL){
-        free(r->reflected_rays);
-    }
-    if (r->refracted_rays != NULL){
-        free(r->refracted_rays);
-    }
+
+void ray2d_free(Ray2d * r){
+    intersection2d_free(r->intersection);
+    free(r);
+}
+
+void intersection2d_free(Intersection2d * i){
+    free(i);
 }

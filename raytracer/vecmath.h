@@ -23,6 +23,7 @@ double vec2_length(vec2 a);
 double vec2_length_squared(vec2 a);
 
 vec2 vec2_normalize(vec2 a);
+vec2 vec2_round(vec2 a);
 
 // 3D vector
 
@@ -45,5 +46,6 @@ double vec3_length(vec3 a);
 double vec3_length_squared(vec3 a);
 
 vec3 vec3_normalize(vec3 a);
+vec3 vec3_round(vec3 a);
 
 #endif
