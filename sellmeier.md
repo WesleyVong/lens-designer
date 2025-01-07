@@ -6,4 +6,4 @@
 
 *Air is assumed to have a constant IOR of 1
 
-** From this [datasheet](resources\srep46111.pdf)
+** From this [datasheet](resources/srep46111.pdf)
