@@ -12,3 +12,10 @@ double sellmeier(Sellmeier * s, double wavelength){
     }
     return sqrt(result);
 }
+
+double get_refraction_angle(double angle, double ior1, double ior2){
+    // Based on snell's law
+    double sin_refraction_angle = (ior1 / ior2) * sin(angle);
+    double refraction_angle = arcsin(sin_refraction_angle);
+    return refraction_angle;
+}

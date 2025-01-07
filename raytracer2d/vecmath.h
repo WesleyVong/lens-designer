@@ -24,6 +24,8 @@ double vec2_length_squared(vec2 a);
 
 vec2 vec2_normalize(vec2 a);
 
+double vec2_angle(vec2 a, vec2 b);
+
 // 3D vector
 
 typedef struct {

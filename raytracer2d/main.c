@@ -10,7 +10,10 @@ int main(){
     image_init(&img, 200, 200);
     img.scale = 1;
 
-    Ray2d * r = ray2d_init(RAY_PRIMARY, (vec2){0, 0}, (vec2){1, 1}, 550, 1);
+    Ray2d * r = ray2d_init(RAY_PRIMARY, (vec2){0, 0}, (vec2){1, 1}, 550, 1, 1);
+
+    Sellmeier s;
+    s.b = (double[]){0, 0};
 
     Material m;
     m.diffuse = (Color){1, 0, 1, 1, COLOR_SRGB};

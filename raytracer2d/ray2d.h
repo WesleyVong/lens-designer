@@ -2,6 +2,7 @@
 #define RAY2D_H
 
 #include "vecmath.h"
+#include "ior.h"
 #include "color.h"
 
 typedef enum {
@@ -27,6 +28,7 @@ typedef struct {
     Color diffuse;
     double shininess;
     double transparency;
+    Sellmeier ior;  // Sellmeier coefficients for index of refraction calculation
 } Material;
 
 typedef struct {
@@ -46,6 +48,7 @@ struct Ray2d {
     long bounces;
     double wavelength;
     double intensity;
+    double ior;    // IOR for current material it is going through
 
     Intersection2d * intersection;
     long reflected_rays_num;
@@ -56,7 +59,7 @@ struct Ray2d {
 
 Intersection2d * intersection2d_init(Intersect2dType type, vec2 point, vec2 normal, double distance);
 void intersection2d_free(Intersection2d * i);
-Ray2d * ray2d_init(Ray2dType type, vec2 origin, vec2 direction, double wavelength, double intensity);
+Ray2d * ray2d_init(Ray2dType type, vec2 origin, vec2 direction, double wavelength, double intensity, double ior);
 void ray2d_free(Ray2d * r);
 
 #endif

@@ -49,6 +49,13 @@ vec2 vec2_normalize(vec2 a){
     return vec2_div(a, vec2_length(a));
 }
 
+double vec2_angle(vec2 direction, vec2 normal){
+    // Reshuffled dot product equation
+    double cos_theta = vec2_dot(direction, normal) / (vec2_length(direction) * vec2_length(normal));
+    double angle = arccos(cos_theta);
+    return angle;
+}
+
 // Vector 3D functions
 
 vec3 vec3_add(vec3 a, vec3 b){
