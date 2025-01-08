@@ -3,3 +3,4 @@
 *.obj
 *.pdb
 *.png
+misc/optical_constants.csv
