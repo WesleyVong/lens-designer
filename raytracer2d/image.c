@@ -14,10 +14,12 @@ vec2 to_pixel(Image * img, vec2 pix){
     return pix;
 }
 
-void image_init(Image * img, long width, long height){
+Image * image_init(long width, long height){
+    Image * img = (Image *)malloc(sizeof(Image));
     img->width = width;
     img->height = height;
     img->color_space = COLOR_SRGB;
+    img->draw_mode = COLOR_ADD;
     // Set Image origin to center of Image
     img->origin = (vec2){width / 2, height / 2};
     img->scale = 1;
@@ -30,6 +32,15 @@ void image_init(Image * img, long width, long height){
         img->image[i + 2] = 0;
         img->image[i + 3] = 255;
     }
+    return img;
+}
+
+void draw_ray_path(Image * img, Ray2d * r){
+    Ray2d * current_ray = r;
+    while (current_ray != NULL){
+        draw_ray(img, current_ray);
+        current_ray = current_ray->refracted_rays;
+    }
 }
 
 void draw_ray(Image * img, Ray2d * r){
@@ -40,7 +51,13 @@ void draw_ray(Image * img, Ray2d * r){
     // Multiply long edge by sqrt(2) in case of diagonal ray
     vec2 ray_direction = r->direction;
     ray_direction.y = -ray_direction.y; // Invert y axis to match Image coordinates
-    vec2 end = vec2_add(start, vec2_mul(ray_direction, long_edge * 1.414));  
+    vec2 end;
+    if (r->intersection->type == INTERSECT_NONE){
+            end = vec2_add(r->origin, vec2_mul(ray_direction, long_edge * 1.414));  // Multiplied long edge by 1.414 to fully fit diagonal (fix)
+    } else {
+        end = vec2_add(r->origin, vec2_mul(ray_direction, r->intersection->distance));
+    }
+    end = to_pixel(img, end);
     Color ray_color = wavelength_to_color(r->wavelength, img->color_space);
     draw_line(img, start, end, ray_color);
 }
@@ -68,10 +85,39 @@ void draw_pixel(Image * img, vec2 pixel, Color c){
     }
     // Draw pixel
     long index = (long)(round(pixel.y) * img->width + round(pixel.x)) * 4;
-    img->image[index] = (unsigned char)(c.r * 255);
-    img->image[index + 1] = (unsigned char)(c.g * 255);
-    img->image[index + 2] = (unsigned char)(c.b * 255);
-    img->image[index + 3] = (unsigned char)(c.a * 255);
+    if (img->draw_mode == COLOR_OVERRIDE){
+        
+    }
+    switch (img->draw_mode){
+        case COLOR_OVERRIDE:
+            img->image[index] = (unsigned char)(c.r * 255);
+            img->image[index + 1] = (unsigned char)(c.g * 255);
+            img->image[index + 2] = (unsigned char)(c.b * 255);
+            img->image[index + 3] = (unsigned char)(c.a * 255);
+            break;
+        case COLOR_ADD:
+            if (0xff - img->image[index] >= (unsigned char)(c.r * 255)){
+                img->image[index] += (unsigned char)(c.r * 255);
+            } else {
+                img->image[index] = 0xff;
+            }
+            if (0xff - img->image[index + 1] >= (unsigned char)(c.g * 255)){
+                img->image[index + 1] += (unsigned char)(c.g * 255);
+            } else {
+                img->image[index + 1] = 0xff;
+            }
+            if (0xff - img->image[index + 2] >= (unsigned char)(c.b * 255)){
+                img->image[index + 2] += (unsigned char)(c.b * 255);
+            } else {
+                img->image[index + 2] = 0xff;
+            }
+            if (0xff - img->image[index + 3] >= (unsigned char)(c.a * 255)){
+                img->image[index + 3] += (unsigned char)(c.a * 255);
+            } else {
+                img->image[index + 3] = 0xff;
+            }
+    }
+
 }
 
 void draw_line(Image *img, vec2 start, vec2 end, Color c){
@@ -108,4 +154,5 @@ void draw_line(Image *img, vec2 start, vec2 end, Color c){
 
 void image_free(Image * img){
     free(img->image);
+    free(img);
 }

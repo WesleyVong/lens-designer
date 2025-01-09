@@ -1,13 +1,13 @@
 #include "ray2d.h"
 
-Ray2d * ray2d_init(Ray2dType type, vec2 origin, vec2 direction, double wavelength, double intensity, double ior){
+Ray2d * ray2d_init(Ray2dType type, vec2 origin, vec2 direction, double wavelength, double intensity, Material * mat){
     Ray2d * r = (Ray2d *)malloc(sizeof(Ray2d));
     r->type = type;
     r->origin = origin;
     r->direction = vec2_normalize(direction);
     r->wavelength = wavelength;
     r->intensity = intensity;
-    r->ior = ior;
+    r->mat = mat;
     r->intersection = intersection2d_init(INTERSECT_NONE, (vec2){0, 0}, (vec2){0, 0}, 0);
     r->reflected_rays_num = 0;
     r->reflected_rays = NULL;

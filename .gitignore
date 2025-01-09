@@ -1,6 +1,6 @@
 *.exe
 *.ilk
-*.obj
+*.objp
 *.pdb
 *.png
 misc/optical_constants.csv

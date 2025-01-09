@@ -11,7 +11,7 @@ typedef struct {
     Ray2d * rays;
 
     long num_objects;
-    Object2d * objects;
+    Object2d ** objects;
 } Raytracer2d;
 
 Raytracer2d * raytracer2d_init(long max_bounces, long max_objects);

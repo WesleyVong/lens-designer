@@ -36,7 +36,7 @@ typedef struct {
     char * name;
     Material * mat;
     vec2 (*get_point)(void * obj, double t);    // The shape of the object should be defined for 0 <= t <= 1
-    Intersection2d (*get_intersection)(void * obj, struct ray2d * r);
+    Intersection2d (*get_intersection)(void * obj, struct Ray2d * r);
 } Object2d;
 
 typedef struct Ray2d Ray2d;
@@ -48,7 +48,7 @@ struct Ray2d {
     long bounces;
     double wavelength;
     double intensity;
-    double ior;    // IOR for current material it is going through
+    Material * mat;    // IOR for current material it is going through
 
     Intersection2d * intersection;
     long reflected_rays_num;
@@ -59,7 +59,7 @@ struct Ray2d {
 
 Intersection2d * intersection2d_init(Intersect2dType type, vec2 point, vec2 normal, double distance);
 void intersection2d_free(Intersection2d * i);
-Ray2d * ray2d_init(Ray2dType type, vec2 origin, vec2 direction, double wavelength, double intensity, double ior);
+Ray2d * ray2d_init(Ray2dType type, vec2 origin, vec2 direction, double wavelength, double intensity, Material * mat);
 void ray2d_free(Ray2d * r);
 
 #endif

@@ -4,11 +4,17 @@
 #include "raytracer2d.h"
 #include "color.h"
 
+typedef enum {
+    COLOR_OVERRIDE,
+    COLOR_ADD
+} DrawMode;
+
 typedef struct {
     long width;
     long height;
 
     ColorSpace color_space;
+    DrawMode draw_mode;
 
     vec2 origin;
 
@@ -17,9 +23,10 @@ typedef struct {
     double t_step;
 } Image;
 
-void image_init(Image * img, long width, long height);
+Image * image_init(long width, long height);
 void image_free(Image * img);
 
+void draw_ray_path(Image * img, Ray2d * r);
 void draw_ray(Image * img, Ray2d * r);
 void draw_object(Image * img, void * obj);
 void draw_pixel(Image * img, vec2 position, Color c);

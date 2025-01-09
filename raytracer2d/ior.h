@@ -11,6 +11,4 @@ typedef struct {
 
 double sellmeier(Sellmeier * s, double wavelength);
 
-double get_refraction_angle(double angle, double ior1, double ior2);
-
 #endif
