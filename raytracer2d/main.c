@@ -1,17 +1,35 @@
 #include "image.h"
 #include "raytracer2d.h"
-#include "lodepng.h"
 #include "object.h"
+#include "lodepng.h"
 #include "stdio.h"
-#include "ior.h"
 #include "math.h"
+#include "debug_tools.h"
+#include "stdlib.h"
 
 int main(){
-    Image * img = image_init(1920, 1080);
-    img->scale = 0.1;
+    StopwatchEntry * se = stopwatch_init();
+    stopwatch_reset(se);
+    Image * img = image_init(1280, 720);
+    img->scale = 0.25;
+    img->origin = (vec2){img->width / 4, img->height / 2};
+    img->color_space = COLOR_LINEAR;
 
-    Ray2d * r = ray2d_init(RAY_PRIMARY, (vec2){0, 0}, (vec2){1, 0}, 450, 1, NULL);
-    Ray2d * r2 = ray2d_init(RAY_PRIMARY, (vec2){0, 0}, (vec2){1, 0}, 650, 1, NULL);
+    Raytracer2d * rt = raytracer2d_init(1, 10);
+
+    double angle = 15;
+    double rads = angle * 3.1415926535 / 180;
+    long num_wavelengths = 20;
+    double minimum_wavelength = 400;
+    double maximum_wavelength = 750;
+    double wavelength_step = (maximum_wavelength - minimum_wavelength) / num_wavelengths;
+    double intensity = 1;
+    rt->num_rays = num_wavelengths;
+    rt->rays = malloc(rt->num_rays * sizeof(Ray2d *));
+    for (long i = 0; i < rt->num_rays; i++){
+        double wavelength = minimum_wavelength + i * wavelength_step;
+        rt->rays[i] = ray2d_init(RAY_PRIMARY, (vec2){0, 0}, (vec2){cos(rads), sin(rads)}, wavelength, intensity, NULL);
+    }
 
     Sellmeier s;
     s.num_coeffs = 3;
@@ -22,26 +40,29 @@ int main(){
     m.diffuse = (Color){0.5, 0.5, 0.5, 1, COLOR_SRGB};
     m.ior = s;
 
-    double angle = 75;
-    double rads = angle * 3.1415926535 / 180;
-    Wall * w = wall_init(0, "Test wall", &m, (vec2){1, 0}, (vec2){cos(rads), sin(rads) }, 1);
+    angle = 60;
+    rads = angle * 3.1415926535 / 180;
+    Line * s1 = line_init((vec2){1, 0}, (vec2){cos(rads), sin(rads)}, 2);
+    Line * s2 = line_init((vec2){2, 0}, (vec2){cos(-rads), sin(-rads)}, 2);
+    Object2d wall = {0, "Wall", 2, (Surface2d *[]){(Surface2d *) s1, (Surface2d *) s2}, (Material *[]){&m}};
 
-    Raytracer2d * rt = raytracer2d_init(1, 10);
-    raytracer2d_add_object(rt, (Object2d *) w);
-    raytrace(rt, r);
-    raytrace(rt, r2);
+    Arc * a = arc_init((vec2){0, 0}, 1, -rads, rads);
 
-    draw_ray_path(img, r);
-    draw_ray_path(img, r2);
-    draw_object(img, w);
+    raytracer2d_add_object(rt, &wall);
+
+    stopwatch_print_reset(se, "Initialize");
+
+    raytrace(rt);
+    stopwatch_print_reset(se, "Raytrace");
+
+    draw_raytracer(img, rt);
+    draw_surface(img, (Surface2d *) a, (Color){1, 1, 1, 1, COLOR_SRGB});
+    stopwatch_print_reset(se, "Draw");
+
 
     lodepng_encode32_file("image.png", img->image, img->width, img->height);
-
-    double wavelengths[3] = {380, 550, 780};
-    for (long i = 0; i < 3; i++){
-        double ior = sellmeier(&s, wavelengths[i]);
-        printf("Wavelength: %f, IOR: %f\r\n", wavelengths[i], ior);
-    }
+    stopwatch_print_reset(se, "Encode");
 
     image_free(img);
+    stopwatch_free(se);
 }

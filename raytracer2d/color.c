@@ -47,7 +47,7 @@ Color wavelength_to_color(double wavelength, ColorSpace color_space){
 
 // A bunch of color space conversion
 // Conversion to and from CIE XYZ color space is based on 
-// https://www.image-engineering.de/library/technotes/958-how-to-convert-between-srgb-and-ciexyz
+// https://en.wikipedia.org/wiki/SRGB#Correspondence_to_CIE_XYZ_stimulus
 
 void to_srgb(Color * c){
     switch(c->color_space){

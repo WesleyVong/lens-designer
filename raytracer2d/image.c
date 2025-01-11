@@ -1,6 +1,9 @@
 #include "image.h"
 #include "math.h"
+#include "surface.h"
+#include "stdlib.h"
 
+void draw_surface(Image * img, Surface2d * s, Color c);
 
 vec2 to_pixel(Image * img, vec2 pix){
     long long_edge = img->width > img->height ? img->width : img->height;
@@ -15,7 +18,7 @@ vec2 to_pixel(Image * img, vec2 pix){
 }
 
 Image * image_init(long width, long height){
-    Image * img = (Image *)malloc(sizeof(Image));
+    Image * img = malloc(sizeof(Image));
     img->width = width;
     img->height = height;
     img->color_space = COLOR_SRGB;
@@ -24,15 +27,17 @@ Image * image_init(long width, long height){
     img->origin = (vec2){width / 2, height / 2};
     img->scale = 1;
     img->t_step = 0.1;
-    img->image = (unsigned char *)malloc(width * height * 4 * sizeof(unsigned char));
-    // Clear Image by setting RGB to 0 and Alpha to 255
-    for (long i = 0; i < width * height * 4; i+=4){
-        img->image[i] = 0;
-        img->image[i + 1] = 0;
-        img->image[i + 2] = 0;
-        img->image[i + 3] = 255;
-    }
+    img->image = calloc(width * height * 4, sizeof(unsigned char));
     return img;
+}
+
+void draw_raytracer(Image * img, Raytracer2d * rt){
+    for (long r = 0; r < rt->num_rays; r++){
+        draw_ray_path(img, rt->rays[r]);
+    }
+    for (long o = 0; o < rt->num_objects; o++){
+        draw_object(img, rt->objects[o]);
+    }
 }
 
 void draw_ray_path(Image * img, Ray2d * r){
@@ -46,30 +51,50 @@ void draw_ray_path(Image * img, Ray2d * r){
 void draw_ray(Image * img, Ray2d * r){
     // Calculate start pixel of ray
     long long_edge = img->width > img->height ? img->width : img->height;
-    vec2 start = to_pixel(img, r->origin);
+    vec2 origin = (vec2){r->origin.x, r->origin.y}; // Negate the y axis to fit canvas orientation
+    vec2 ray_direction = (vec2){r->direction.x, r->direction.y};   // Negate the y axis to fit canvas orientation
+    vec2 start = to_pixel(img, origin);
     // Calculate end pixel of ray
-    // Multiply long edge by sqrt(2) in case of diagonal ray
-    vec2 ray_direction = r->direction;
-    ray_direction.y = -ray_direction.y; // Invert y axis to match Image coordinates
     vec2 end;
     if (r->intersection->type == INTERSECT_NONE){
-            end = vec2_add(r->origin, vec2_mul(ray_direction, long_edge * 1.414));  // Multiplied long edge by 1.414 to fully fit diagonal (fix)
+            end = vec2_add(origin, vec2_mul(ray_direction, long_edge * 1.414));  // Multiplied long edge by 1.414 to fully fit diagonal (fix)
     } else {
-        end = vec2_add(r->origin, vec2_mul(ray_direction, r->intersection->distance));
+        end = vec2_add(origin, vec2_mul(ray_direction, r->intersection->distance));
     }
     end = to_pixel(img, end);
     Color ray_color = wavelength_to_color(r->wavelength, img->color_space);
+    // Multiply ray color by intensity
+    ray_color.r *= r->intensity;
+    ray_color.g *= r->intensity;
+    ray_color.b *= r->intensity;
     draw_line(img, start, end, ray_color);
 }
 
-void draw_object(Image * img, void * obj){
-    // Draw object shape
-    Object2d * o = (Object2d *)obj;
-    vec2 start_point = o->get_point(o, 0);
+void draw_object(Image * img, Object2d * obj){
+    for (long s = 0; s < obj->num_surfaces; s++){
+        Material * m = (s == 0) ? obj->materials[s] : obj->materials[s-1];
+        Color c = m->diffuse;
+        switch (img->color_space){
+            case COLOR_SRGB:
+                to_srgb(&c);
+                break;
+            case COLOR_LINEAR:
+                to_linear(&c);
+                break;
+        }
+        draw_surface(img, obj->surfaces[s], c);
+    }
+}
+
+void draw_surface(Image * img, Surface2d * s, Color c){
+    // Draw surface
+    vec2 start_point = s->get_point(s, 0);
     vec2 end_point;
     for (double t = img->t_step; t <= 1; t += img->t_step){
-        end_point = o->get_point(o, t);
-        draw_line(img, to_pixel(img, start_point), to_pixel(img, end_point), o->mat->diffuse);
+        end_point = s->get_point(s, t);
+        vec2 line_start = to_pixel(img, start_point);
+        vec2 line_end = to_pixel(img, end_point);
+        draw_line(img, line_start, line_end, c);
         start_point = end_point;
     }
 }
@@ -84,7 +109,7 @@ void draw_pixel(Image * img, vec2 pixel, Color c){
         return;
     }
     // Draw pixel
-    long index = (long)(round(pixel.y) * img->width + round(pixel.x)) * 4;
+    long index = (long)(floor(pixel.y) * img->width + floor(pixel.x)) * 4;
     if (img->draw_mode == COLOR_OVERRIDE){
         
     }

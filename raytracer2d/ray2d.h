@@ -4,6 +4,7 @@
 #include "vecmath.h"
 #include "ior.h"
 #include "color.h"
+#include "intersection.h"
 
 typedef enum {
     RAY_PRIMARY,
@@ -11,33 +12,12 @@ typedef enum {
     RAY_REFRACTED
 } Ray2dType;
 
-typedef enum {
-    INTERSECT_NONE,
-    INTERSECT_INTERIOR, // Ray intersects with inside face of object
-    INTERSECT_EXTERIOR, // Ray intersects with outside face of object
-} Intersect2dType;
-
-typedef struct {
-    Intersect2dType type;
-    vec2 point;
-    vec2 normal;
-    double distance;   // The distance along the ray to the intersection point
-} Intersection2d;
-
 typedef struct {
     Color diffuse;
     double shininess;
     double transparency;
     Sellmeier ior;  // Sellmeier coefficients for index of refraction calculation
 } Material;
-
-typedef struct {
-    long id;
-    char * name;
-    Material * mat;
-    vec2 (*get_point)(void * obj, double t);    // The shape of the object should be defined for 0 <= t <= 1
-    Intersection2d (*get_intersection)(void * obj, struct Ray2d * r);
-} Object2d;
 
 typedef struct Ray2d Ray2d;
 

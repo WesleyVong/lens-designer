@@ -3,6 +3,7 @@
 
 #include "raytracer2d.h"
 #include "color.h"
+#include "object.h"
 
 typedef enum {
     COLOR_OVERRIDE,
@@ -26,9 +27,11 @@ typedef struct {
 Image * image_init(long width, long height);
 void image_free(Image * img);
 
+void draw_raytracer(Image * img, Raytracer2d * rt);
 void draw_ray_path(Image * img, Ray2d * r);
 void draw_ray(Image * img, Ray2d * r);
-void draw_object(Image * img, void * obj);
+void draw_object(Image * img, Object2d * obj);
+void draw_surface(Image * img, Surface2d * s, Color c);
 void draw_pixel(Image * img, vec2 position, Color c);
 void draw_line(Image * img, vec2 start, vec2 end, Color c);
 
