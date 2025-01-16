@@ -86,5 +86,49 @@ Intersection2d arc_intersection(void * obj, Ray2d * r){
     if (r->direction.x == 0 && r->direction.y == 0){
         return i;
     }
+    // Derived from the ray sphere intersection formula
+    double rsq = a->radius * a->radius;
+    // Distance between circle and ray origin
+    vec2 dp = vec2_sub(a->origin, r->origin);
+
+    // Determine whether the ray starts inside or outside the circle
+    if (vec2_length_squared(dp) < rsq){
+        i.type = INTERSECT_INTERIOR;
+    }
+
+    // Closest approach of ray to circle center
+    double tc = vec2_dot(r->direction, dp) / vec2_length(r->direction);
+
+    // No intersection if closest approach is behind the ray
+    if (i.type != INTERSECT_INTERIOR && tc < 0){
+        return i;
+    }
+
+    double dsq = vec2_length_squared(vec2_sub(vec2_add(r->origin, vec2_mul(r->direction, tc)), a->origin));
+
+    // No intersection if closest approach is outside the circle
+    if (i.type != INTERSECT_INTERIOR && dsq > rsq){
+        return i;
+    }
+
+    double toffset = sqrt(rsq - dsq) / vec2_length(r->direction);
+
+    if (i.type == INTERSECT_INTERIOR){
+        i.distance = tc + toffset;
+    } else {
+        i.type = INTERSECT_EXTERIOR;
+        i.distance = tc - toffset;
+    }
+
+    i.type = INTERSECT_VALID;
+    i.point = vec2_add(r->origin, vec2_mul(r->direction, i.distance));
+    double angle = vec2_angle(vec2_sub(i.point, a->origin), (vec2){1,0});    // Get angle of intersection
+    // If angle is outside of arc, return no intersection
+    if (angle < a->start_angle || angle > a->end_angle){
+        i.type = INTERSECT_NONE;
+        return i;
+    }
+    i.normal = vec2_normalize(vec2_sub(i.point, a->origin));
+
     return i;
 }

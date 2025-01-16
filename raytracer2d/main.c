@@ -3,6 +3,7 @@
 #include "object.h"
 #include "lodepng.h"
 #include "stdio.h"
+#define _USE_MATH_DEFINES
 #include "math.h"
 #include "debug_tools.h"
 #include "stdlib.h"
@@ -41,13 +42,16 @@ int main(){
     m.ior = s;
 
     angle = 60;
-    rads = angle * 3.1415926535 / 180;
+    rads = angle * M_PI / 180;
     Line * s1 = line_init((vec2){1, 0}, (vec2){cos(rads), sin(rads)}, 2);
     Line * s2 = line_init((vec2){2, 0}, (vec2){cos(-rads), sin(-rads)}, 2);
     Object2d wall = {0, "Wall", 2, (Surface2d *[]){(Surface2d *) s1, (Surface2d *) s2}, (Material *[]){&m}};
 
-    Arc * a = arc_init((vec2){0, 0}, 1, -rads, rads);
+    Arc * a1 = arc_init((vec2){1.2, 0}, 1, -rads + M_PI, rads + M_PI);
 
+    Object2d lens = {1, "Lens", 1, (Surface2d *[]){(Surface2d *) a1}, (Material *[]){&m}};
+
+    raytracer2d_add_object(rt, &lens);
     raytracer2d_add_object(rt, &wall);
 
     stopwatch_print_reset(se, "Initialize");
@@ -56,7 +60,7 @@ int main(){
     stopwatch_print_reset(se, "Raytrace");
 
     draw_raytracer(img, rt);
-    draw_surface(img, (Surface2d *) a, (Color){1, 1, 1, 1, COLOR_SRGB});
+    draw_surface(img, (Surface2d *) a1, (Color){1, 1, 1, 1, COLOR_SRGB});
     stopwatch_print_reset(se, "Draw");
 
 
