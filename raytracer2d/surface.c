@@ -50,7 +50,8 @@ Intersection2d line_intersection(void * obj, Ray2d * r){
     i.point = vec2_add(r->origin, vec2_mul(r->direction, rt));
     // The normal is the perpendicular vector of the line pointing towards the ray
     vec2 normal = vec2_normalize((vec2){l->direction.y, -l->direction.x});
-    if (vec2_dot(normal, r->direction) > 0){
+    // If the normal and the ray are pointing in the same direction, flip the normal
+    if (vec2_dot(normal, r->direction) > 0){    
         normal = vec2_neg(normal);
     }
     i.normal = normal;
@@ -129,6 +130,9 @@ Intersection2d arc_intersection(void * obj, Ray2d * r){
         return i;
     }
     i.normal = vec2_normalize(vec2_sub(i.point, a->origin));
-
+    // If the normal and the ray are pointing in the same direction, flip the normal
+    if (vec2_dot(i.normal, r->direction) > 0){
+        i.normal = vec2_neg(i.normal);
+    }
     return i;
 }

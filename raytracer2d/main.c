@@ -29,7 +29,7 @@ int main(){
     rt->rays = malloc(rt->num_rays * sizeof(Ray2d *));
     for (long i = 0; i < rt->num_rays; i++){
         double wavelength = minimum_wavelength + i * wavelength_step;
-        rt->rays[i] = ray2d_init(RAY_PRIMARY, (vec2){0, 0}, (vec2){cos(rads), sin(rads)}, wavelength, intensity, NULL);
+        rt->rays[i] = ray2d_init(RAY_PRIMARY, (vec2){0, 0.25}, (vec2){1,0}, wavelength, intensity, NULL);
     }
 
     Sellmeier s;
@@ -48,8 +48,9 @@ int main(){
     Object2d wall = {0, "Wall", 2, (Surface2d *[]){(Surface2d *) s1, (Surface2d *) s2}, (Material *[]){&m}};
 
     Arc * a1 = arc_init((vec2){1.2, 0}, 1, -rads + M_PI, rads + M_PI);
+    Arc * a2 = arc_init((vec2){-0.3, 0}, 1, -rads, rads);
 
-    Object2d lens = {1, "Lens", 1, (Surface2d *[]){(Surface2d *) a1}, (Material *[]){&m}};
+    Object2d lens = {1, "Lens", 2, (Surface2d *[]){(Surface2d *) a1, (Surface2d *) a2}, (Material *[]){&m}};
 
     raytracer2d_add_object(rt, &lens);
     raytracer2d_add_object(rt, &wall);
