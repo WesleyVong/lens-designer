@@ -8,7 +8,11 @@ The goal of the raytracers is to simulate accurate light refraction throughout t
 
 ### 2D Raytracer
 
-A sequential raytracer that assumes 100% transparency in the optics.
+A sequential raytracer.
+
+#### R2D script
+
+A simple script that allows raytracer data to be stored. More information can be found [here](R2D.md).
 
 ### 3D Raytracer
 

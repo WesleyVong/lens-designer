@@ -5,7 +5,6 @@
 #include "object.h"
 
 typedef struct {
-    long max_bounces;
     long max_objects;
 
     long num_rays;
@@ -15,7 +14,7 @@ typedef struct {
     Object2d ** objects;
 } Raytracer2d;
 
-Raytracer2d * raytracer2d_init(long max_bounces, long max_objects);
+Raytracer2d * raytracer2d_init();
 void raytracer2d_free(Raytracer2d * rt);
 void raytracer2d_add_object(Raytracer2d * rt, Object2d * obj);
 void raytrace(Raytracer2d * rt);

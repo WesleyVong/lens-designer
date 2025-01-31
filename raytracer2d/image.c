@@ -28,6 +28,7 @@ Image * image_init(long width, long height){
     img->scale = 1;
     img->t_step = 0.1;
     img->image = calloc(width * height * 4, sizeof(unsigned char));
+    img->name = NULL;
     return img;
 }
 

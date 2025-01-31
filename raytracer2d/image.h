@@ -11,6 +11,8 @@ typedef enum {
 } DrawMode;
 
 typedef struct {
+    unsigned char * name;
+
     long width;
     long height;
 

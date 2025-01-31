@@ -7,16 +7,23 @@
 #include "math.h"
 #include "debug_tools.h"
 #include "stdlib.h"
+#include "parser.h"
 
 int main(){
     StopwatchEntry * se = stopwatch_init();
     stopwatch_reset(se);
-    Image * img = image_init(1280, 720);
-    img->scale = 0.25;
+
+    Image * img;
+    Raytracer2d * rt;
+
+    parse_file("test_script.r2d", &img, &rt);
+
     img->origin = (vec2){img->width / 4, img->height / 2};
     img->color_space = COLOR_LINEAR;
 
-    Raytracer2d * rt = raytracer2d_init(1, 10);
+    if (img->name == NULL){
+        img->name = "image.png";
+    }
 
     double angle = 15;
     double rads = angle * 3.1415926535 / 180;
@@ -61,11 +68,9 @@ int main(){
     stopwatch_print_reset(se, "Raytrace");
 
     draw_raytracer(img, rt);
-    draw_surface(img, (Surface2d *) a1, (Color){1, 1, 1, 1, COLOR_SRGB});
     stopwatch_print_reset(se, "Draw");
 
-
-    lodepng_encode32_file("image.png", img->image, img->width, img->height);
+    lodepng_encode32_file(img->name, img->image, img->width, img->height);
     stopwatch_print_reset(se, "Encode");
 
     image_free(img);

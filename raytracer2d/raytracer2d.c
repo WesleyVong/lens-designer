@@ -6,16 +6,15 @@
 
 void raytrace_ray(Raytracer2d * rt, Ray2d * r);
 
-Raytracer2d * raytracer2d_init(long max_bounces, long max_objects){
+Raytracer2d * raytracer2d_init(){
     Raytracer2d * rt = (Raytracer2d *)malloc(sizeof(Raytracer2d));
-    rt->max_bounces = max_bounces;
-    rt->max_objects = max_objects;
     rt->num_objects = 0;
-    rt->objects = malloc(max_objects * sizeof(Surface2d *));
+    rt->objects = NULL;
     return rt;
 }
 
 void raytracer2d_free(Raytracer2d * rt){
+    free(rt->objects);
     free(rt);
 }
 
@@ -34,8 +33,10 @@ vec2 refract(vec2 i, vec2 n, double eta1, double eta2) {
 }
 
 void raytracer2d_add_object(Raytracer2d * rt, Object2d * obj){
-    if (rt->num_objects >= rt->max_objects){
-        return;
+    if (rt->num_objects == 0){
+        rt->objects = (Object2d **)malloc(sizeof(Object2d *));
+    } else {
+        rt->objects = (Object2d **)realloc(rt->objects, (rt->num_objects + 1) * sizeof(Object2d *));
     }
     rt->objects[rt->num_objects] = obj;
     rt->num_objects++;
