@@ -36,8 +36,18 @@ void draw_raytracer(Image * img, Raytracer2d * rt){
     for (long r = 0; r < rt->num_rays; r++){
         draw_ray_path(img, rt->rays[r]);
     }
-    for (long o = 0; o < rt->num_objects; o++){
-        draw_object(img, rt->objects[o]);
+    for (long s = 0; s < rt->num_surfaces; s++){
+        Material * m = (s == 0) ? rt->materials[s] : rt->materials[s-1];
+        Color c = m->diffuse;
+        switch (img->color_space){
+            case COLOR_SRGB:
+                to_srgb(&c);
+                break;
+            case COLOR_LINEAR:
+                to_linear(&c);
+                break;
+        }
+        draw_surface(img, rt->surfaces[s], c);
     }
 }
 
@@ -69,22 +79,6 @@ void draw_ray(Image * img, Ray2d * r){
     ray_color.g *= r->intensity;
     ray_color.b *= r->intensity;
     draw_line(img, start, end, ray_color);
-}
-
-void draw_object(Image * img, Object2d * obj){
-    for (long s = 0; s < obj->num_surfaces; s++){
-        Material * m = (s == 0) ? obj->materials[s] : obj->materials[s-1];
-        Color c = m->diffuse;
-        switch (img->color_space){
-            case COLOR_SRGB:
-                to_srgb(&c);
-                break;
-            case COLOR_LINEAR:
-                to_linear(&c);
-                break;
-        }
-        draw_surface(img, obj->surfaces[s], c);
-    }
 }
 
 void draw_surface(Image * img, Surface2d * s, Color c){

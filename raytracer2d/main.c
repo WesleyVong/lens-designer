@@ -1,6 +1,5 @@
 #include "image.h"
 #include "raytracer2d.h"
-#include "object.h"
 #include "lodepng.h"
 #include "stdio.h"
 #define _USE_MATH_DEFINES
@@ -48,19 +47,32 @@ int main(){
     m.diffuse = (Color){0.5, 0.5, 0.5, 1, COLOR_SRGB};
     m.ior = s;
 
+    Sellmeier air;
+    air.num_coeffs = 0;
+
+    Material m2;
+    m2.diffuse = (Color){0.5, 0.5, 0.5, 1, COLOR_SRGB};
+    m2.ior = air;
+
     angle = 60;
     rads = angle * M_PI / 180;
     Line * s1 = line_init((vec2){1, 0}, (vec2){cos(rads), sin(rads)}, 2);
     Line * s2 = line_init((vec2){2, 0}, (vec2){cos(-rads), sin(-rads)}, 2);
-    Object2d wall = {0, "Wall", 2, (Surface2d *[]){(Surface2d *) s1, (Surface2d *) s2}, (Material *[]){&m}};
 
+    angle = 30;
+    rads = angle * M_PI / 180;
     Arc * a1 = arc_init((vec2){1.2, 0}, 1, -rads + M_PI, rads + M_PI);
     Arc * a2 = arc_init((vec2){-0.3, 0}, 1, -rads, rads);
 
-    Object2d lens = {1, "Lens", 2, (Surface2d *[]){(Surface2d *) a1, (Surface2d *) a2}, (Material *[]){&m}};
+    raytracer2d_add_surface(rt, (Surface2d *) a1);
+    raytracer2d_add_surface(rt, (Surface2d *) a2);
 
-    raytracer2d_add_object(rt, &lens);
-    raytracer2d_add_object(rt, &wall);
+    raytracer2d_add_surface(rt, (Surface2d *) s1);
+    raytracer2d_add_surface(rt, (Surface2d *) s2);
+
+    raytracer2d_add_material(rt, &m);
+    raytracer2d_add_material(rt, &m2);
+    raytracer2d_add_material(rt, &m);
 
     stopwatch_print_reset(se, "Initialize");
 
