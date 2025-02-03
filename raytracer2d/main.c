@@ -21,6 +21,7 @@ int main(int argc, char ** argv){
     }
 
     parse_file(argv[1], &img, &rt);
+    // parse_file("test_script.r2d", &img, &rt);
 
     img->origin = (vec2){img->width / 4, img->height / 2};
     img->color_space = COLOR_LINEAR;
@@ -31,13 +32,14 @@ int main(int argc, char ** argv){
 
     stopwatch_print_reset(se, "Initialize");
 
-    raytrace(rt);
-    stopwatch_print_reset(se, "Raytrace");
+    // raytrace(rt);
+    // stopwatch_print_reset(se, "Raytrace");
 
     draw_raytracer(img, rt);
     stopwatch_print_reset(se, "Draw");
 
     lodepng_encode32_file(img->name, img->image, img->width, img->height);
+    printf("Wrote image to %s\n", img->name);
     stopwatch_print_reset(se, "Encode");
 
     raytracer2d_free_all(rt);

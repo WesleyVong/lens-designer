@@ -8,6 +8,7 @@
 typedef enum {
     CMD_NONE,
     CMD_IMAGE,
+    CMD_RAYTRACE,
     CMD_IOR,
     CMD_MATERIAL,
     CMD_ARC,
@@ -44,6 +45,8 @@ Command * parse_line(char * line){
             case CMD_NONE:
                 if (strcmp(token, "IMAGE") == 0){
                     cmd->keyword = CMD_IMAGE;
+                } else if (strcmp(token, "RAYTRACE") == 0){
+                    cmd->keyword = CMD_RAYTRACE;
                 } else if (strcmp(token, "IOR") == 0){
                     cmd->keyword = CMD_IOR;
                 } else if (strcmp(token, "MATERIAL") == 0){
@@ -71,6 +74,8 @@ Command * parse_line(char * line){
                         *(long *)cmd->args[cmd->num_args-1] = strtol(token, NULL, 10);
                         break;
                 }
+                break;
+            case CMD_RAYTRACE:
                 break;
             case CMD_IOR:
                 switch (cmd->num_args-1){
@@ -116,9 +121,9 @@ void parse_file(char * fname, Image ** img, Raytracer2d ** rt){
     char line[MAX_LINE_LENGTH];
     long line_num = 0;
 
-    Sellmeier * ior;
+    Sellmeier * ior = NULL;
 
-    Material * m;
+    Material * m = NULL;
 
     while (fgets(line, MAX_LINE_LENGTH, f)){
         Command * cmd = parse_line(line);
@@ -139,6 +144,9 @@ void parse_file(char * fname, Image ** img, Raytracer2d ** rt){
                     (*img)->name = malloc(strlen(image_name) * sizeof(char));
                     strcpy((*img)->name, image_name);
                 }
+                break;
+            case CMD_RAYTRACE:
+                raytrace(*rt);
                 break;
             case CMD_IOR:
                 if (cmd->num_args < 1){
@@ -171,12 +179,10 @@ void parse_file(char * fname, Image ** img, Raytracer2d ** rt){
                 } else {
                     m->diffuse = (Color){*(double *)cmd->args[0], *(double *)cmd->args[1], *(double *)cmd->args[2], *(double *)cmd->args[3], COLOR_SRGB};
                 }
+                raytracer2d_add_material(*rt, m);
                 break;
             case CMD_ARC:
                 if (cmd->num_args < 5){
-                    break;
-                }
-                if (m == NULL){
                     break;
                 }
                 double arc_x = *(double *)cmd->args[0];
@@ -186,13 +192,9 @@ void parse_file(char * fname, Image ** img, Raytracer2d ** rt){
                 double arc_end = *(double *)cmd->args[4];
                 Arc * a = arc_init((vec2){arc_x, arc_y}, arc_radius, arc_start, arc_end);
                 raytracer2d_add_surface(*rt, (Surface2d *) a);
-                raytracer2d_add_material(*rt, m);
                 break;
             case CMD_LINE:
                 if (cmd->num_args < 5){
-                    break;
-                }
-                if (m == NULL){
                     break;
                 }
                 vec2 line_origin = (vec2){*(double *)cmd->args[0], *(double *)cmd->args[1]};
@@ -200,7 +202,6 @@ void parse_file(char * fname, Image ** img, Raytracer2d ** rt){
                 double line_length = *(double *)cmd->args[4];
                 Line * l = line_init(line_origin, line_direction, line_length);
                 raytracer2d_add_surface(*rt, (Surface2d *) l);
-                raytracer2d_add_material(*rt, m);
                 break;
             case CMD_RAY:
                 if (cmd->num_args < 6){

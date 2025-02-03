@@ -1,4 +1,5 @@
 import csv
+import os
 
 def csv_to_markdown(csv_filepath, markdown_filepath):
     with open(csv_filepath, 'r') as csv_file:
@@ -18,8 +19,9 @@ def csv_to_markdown(csv_filepath, markdown_filepath):
         markdown_file.write('\n'.join(markdown_lines))
 
 # File paths
-csv_filepath = 'misc/optical_constants.csv'
-markdown_filepath = 'misc/optical_constants.md'
+dirname = os.path.dirname(__file__)
+csv_filepath = os.path.join(dirname, 'optical_constants.csv')
+markdown_filepath = os.path.join(dirname, 'optical_constants.md')
 
 # Convert CSV to Markdown
 csv_to_markdown(csv_filepath, markdown_filepath)

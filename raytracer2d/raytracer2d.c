@@ -18,35 +18,44 @@ Raytracer2d * raytracer2d_init(){
 }
 
 void raytracer2d_free(Raytracer2d * rt){
-    free(rt->rays);
-    free(rt->materials);
-    free(rt->surfaces);
+    if (rt->rays != NULL){
+        free(rt->rays);
+    }
+    if (rt->materials != NULL){
+        free(rt->materials);
+    }
+    if (rt->surfaces != NULL){
+        free(rt->surfaces);
+    }
     free(rt);
 }
 
 void raytracer2d_free_all(Raytracer2d * rt){
-    for (long r = 0; r < rt->num_rays; r++){
-        if (rt->rays[r] == NULL){
-            continue;
+    if (rt->rays != NULL){
+        for (long r = 0; r < rt->num_rays; r++){
+            if (rt->rays[r] == NULL){
+                continue;
+            }
+            ray2d_free(rt->rays[r]);
         }
-        ray2d_free(rt->rays[r]);
     }
-    for (long m = 0; m < rt->num_materials; m++){
-        if (rt->materials[m] == NULL){
-            continue;
+    if (rt->materials != NULL){
+        for (long m = 0; m < rt->num_materials; m++){
+            if (rt->materials[m] == NULL){
+                continue;
+            }
+            free(rt->materials[m]);
         }
-        free(rt->materials[m]);
     }
-    for (long s = 0; s < rt->num_surfaces; s++){
-        if (rt->surfaces[s] == NULL){
-            continue;
+    if (rt->surfaces != NULL){
+        for (long s = 0; s < rt->num_surfaces; s++){
+            if (rt->surfaces[s] == NULL){
+                continue;
+            }
+            rt->surfaces[s]->free(rt->surfaces[s]);
         }
-        rt->surfaces[s]->free(rt->surfaces[s]);
     }
-    free(rt->rays);
-    free(rt->materials);
-    free(rt->surfaces);
-    free(rt);
+    raytracer2d_free(rt);
 }
 
 // Derived from the GLSL document page 153
