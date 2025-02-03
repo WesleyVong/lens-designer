@@ -8,6 +8,7 @@
 typedef struct {
     vec2 (*get_point)(void * surface, double t);    // The shape of the object should be defined for 0 <= t <= 1
     Intersection2d (*get_intersection)(void * surface, Ray2d * r);
+    void (*free)(void * surface);
 } Surface2d;
 
 typedef struct {

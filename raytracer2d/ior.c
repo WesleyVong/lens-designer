@@ -3,6 +3,9 @@
 
 double sellmeier(Sellmeier * s, double wavelength){
     double result = 1;
+    if (s->num_coeffs == 0){
+        return 1;   // Air
+    }
     double lambda = wavelength / 1000; // Lambda is in micrometers, wavelength is in nanometers
     double lambda_sq = lambda * lambda;
     for (long i = 0; i < s->num_coeffs; i++){

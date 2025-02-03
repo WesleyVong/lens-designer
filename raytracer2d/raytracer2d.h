@@ -19,6 +19,8 @@ typedef struct {
 
 Raytracer2d * raytracer2d_init();
 void raytracer2d_free(Raytracer2d * rt);
+void raytracer2d_free_all(Raytracer2d * rt);    // Frees rt and all subobjects
+void raytracer2d_add_ray(Raytracer2d * rt, Ray2d * r);
 void raytracer2d_add_surface(Raytracer2d * rt, Surface2d * surf);
 void raytracer2d_add_material(Raytracer2d * rt, Material * mat);
 void raytrace(Raytracer2d * rt);

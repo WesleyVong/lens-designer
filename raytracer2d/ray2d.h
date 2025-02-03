@@ -16,7 +16,7 @@ typedef struct {
     Color diffuse;
     double shininess;
     double transparency;
-    Sellmeier ior;  // Sellmeier coefficients for index of refraction calculation
+    Sellmeier * ior;  // Sellmeier coefficients for index of refraction calculation
 } Material;
 
 typedef struct Ray2d Ray2d;

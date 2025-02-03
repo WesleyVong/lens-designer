@@ -8,6 +8,8 @@ void raytrace_ray(Raytracer2d * rt, Ray2d * r);
 
 Raytracer2d * raytracer2d_init(){
     Raytracer2d * rt = (Raytracer2d *)malloc(sizeof(Raytracer2d));
+    rt->num_rays = 0;
+    rt->rays = NULL;
     rt->num_materials = 0;
     rt->materials = NULL;
     rt->num_surfaces = 0;
@@ -16,6 +18,32 @@ Raytracer2d * raytracer2d_init(){
 }
 
 void raytracer2d_free(Raytracer2d * rt){
+    free(rt->rays);
+    free(rt->materials);
+    free(rt->surfaces);
+    free(rt);
+}
+
+void raytracer2d_free_all(Raytracer2d * rt){
+    for (long r = 0; r < rt->num_rays; r++){
+        if (rt->rays[r] == NULL){
+            continue;
+        }
+        ray2d_free(rt->rays[r]);
+    }
+    for (long m = 0; m < rt->num_materials; m++){
+        if (rt->materials[m] == NULL){
+            continue;
+        }
+        free(rt->materials[m]);
+    }
+    for (long s = 0; s < rt->num_surfaces; s++){
+        if (rt->surfaces[s] == NULL){
+            continue;
+        }
+        rt->surfaces[s]->free(rt->surfaces[s]);
+    }
+    free(rt->rays);
     free(rt->materials);
     free(rt->surfaces);
     free(rt);
@@ -33,6 +61,16 @@ vec2 refract(vec2 i, vec2 n, double eta1, double eta2) {
     vec2 eta_n = vec2_mul(n, eta * vec2_dot(n, i) + sqrt(k));
     vec2 result = (vec2){eta_i.x - eta_n.x, eta_i.y - eta_n.y};
     return result;
+}
+
+void raytracer2d_add_ray(Raytracer2d * rt, Ray2d * r){
+    if (rt->num_rays == 0){
+        rt->rays = (Ray2d **)malloc(sizeof(Ray2d *));
+    } else {
+        rt->rays = (Ray2d **)realloc(rt->rays, (rt->num_rays + 1) * sizeof(Ray2d *));
+    }
+    rt->rays[rt->num_rays] = r;
+    rt->num_rays++;
 }
 
 void raytracer2d_add_surface(Raytracer2d * rt, Surface2d * surf){
@@ -78,17 +116,17 @@ void raytrace_ray(Raytracer2d * rt, Ray2d * r){
         // Ray entering object
         if (s == 0){
             ior1 = 1;
-            ior2 = sellmeier(&rt->materials[s]->ior, current_ray->wavelength);
+            ior2 = sellmeier(rt->materials[s]->ior, current_ray->wavelength);
         }
         // Ray exiting object
         else if (s == rt->num_surfaces - 1){
-            ior1 = sellmeier(&rt->materials[s-1]->ior, current_ray->wavelength);
+            ior1 = sellmeier(rt->materials[s-1]->ior, current_ray->wavelength);
             ior2 = 1;
         }
         // Ray inside object
         else {
-            ior1 = sellmeier(&rt->materials[s-1]->ior, current_ray->wavelength);
-            ior2 = sellmeier(&rt->materials[s]->ior, current_ray->wavelength);
+            ior1 = sellmeier(rt->materials[s-1]->ior, current_ray->wavelength);
+            ior2 = sellmeier(rt->materials[s]->ior, current_ray->wavelength);
         }
 
         vec2 refraction_ray_origin = i.point;

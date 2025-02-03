@@ -10,6 +10,7 @@ Line * line_init(vec2 origin, vec2 direction, double length){
     
     l->surface.get_point = line_shape;
     l->surface.get_intersection = line_intersection;
+    l->surface.free = line_free;
     return l;
 }
 void line_free(Line * l){
@@ -68,6 +69,7 @@ Arc * arc_init(vec2 origin, double radius, double start_angle, double end_angle)
     
     a->surface.get_point = arc_shape;
     a->surface.get_intersection = arc_intersection;
+    a->surface.free = arc_free;
     return a;
 }
 void arc_free(Arc * a){

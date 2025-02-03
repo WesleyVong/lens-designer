@@ -95,44 +95,45 @@ void draw_surface(Image * img, Surface2d * s, Color c){
 }
 
 void draw_pixel(Image * img, vec2 pixel, Color c){
-    // Clip color to 0 and 1
-    c.r = c.r < 0 ? 0 : c.r > 1 ? 1 : c.r;
-    c.g = c.g < 0 ? 0 : c.g > 1 ? 1 : c.g;
-    c.b = c.b < 0 ? 0 : c.b > 1 ? 1 : c.b;
     // Check if position is within Image bounds
     if (pixel.x < 0 || pixel.x >= img->width || pixel.y < 0 || pixel.y >= img->height){
         return;
     }
+    // Clip color to 0 and 1
+    c.r = c.r < 0 ? 0 : c.r > 1 ? 1 : c.r;
+    c.g = c.g < 0 ? 0 : c.g > 1 ? 1 : c.g;
+    c.b = c.b < 0 ? 0 : c.b > 1 ? 1 : c.b;
+    unsigned char r = c.r * 255;
+    unsigned char g = c.g * 255;
+    unsigned char b = c.b * 255;
+    unsigned char a = c.a * 255;
     // Draw pixel
     long index = (long)(floor(pixel.y) * img->width + floor(pixel.x)) * 4;
-    if (img->draw_mode == COLOR_OVERRIDE){
-        
-    }
     switch (img->draw_mode){
         case COLOR_OVERRIDE:
-            img->image[index] = (unsigned char)(c.r * 255);
-            img->image[index + 1] = (unsigned char)(c.g * 255);
-            img->image[index + 2] = (unsigned char)(c.b * 255);
-            img->image[index + 3] = (unsigned char)(c.a * 255);
+            img->image[index] = r;
+            img->image[index + 1] = g;
+            img->image[index + 2] = b;
+            img->image[index + 3] = a;
             break;
         case COLOR_ADD:
-            if (0xff - img->image[index] >= (unsigned char)(c.r * 255)){
-                img->image[index] += (unsigned char)(c.r * 255);
+            if (0xff - img->image[index] >= r){
+                img->image[index] += r;
             } else {
                 img->image[index] = 0xff;
             }
-            if (0xff - img->image[index + 1] >= (unsigned char)(c.g * 255)){
-                img->image[index + 1] += (unsigned char)(c.g * 255);
+            if (0xff - img->image[index + 1] >= g){
+                img->image[index + 1] += g;
             } else {
                 img->image[index + 1] = 0xff;
             }
-            if (0xff - img->image[index + 2] >= (unsigned char)(c.b * 255)){
-                img->image[index + 2] += (unsigned char)(c.b * 255);
+            if (0xff - img->image[index + 2] >= b){
+                img->image[index + 2] += b;
             } else {
                 img->image[index + 2] = 0xff;
             }
-            if (0xff - img->image[index + 3] >= (unsigned char)(c.a * 255)){
-                img->image[index + 3] += (unsigned char)(c.a * 255);
+            if (0xff - img->image[index + 3] >= a){
+                img->image[index + 3] += a;
             } else {
                 img->image[index + 3] = 0xff;
             }
@@ -141,11 +142,6 @@ void draw_pixel(Image * img, vec2 pixel, Color c){
 }
 
 void draw_line(Image *img, vec2 start, vec2 end, Color c){
-    // Clip color to 0 and 1
-    c.r = c.r < 0 ? 0 : c.r > 1 ? 1 : c.r;
-    c.g = c.g < 0 ? 0 : c.g > 1 ? 1 : c.g;
-    c.b = c.b < 0 ? 0 : c.b > 1 ? 1 : c.b;
-
     double dx = end.x - start.x;
     double dy = end.y - start.y;
 
@@ -156,18 +152,29 @@ void draw_line(Image *img, vec2 start, vec2 end, Color c){
 
     // By default step along x axis
     // If x is zero, then step along y axis
+    long start_offset = 0;
     long num_steps;
     vec2 step;
     if (fabs(dy) > fabs(dx)){
         step = (vec2){dx / fabs(dy), dy / fabs(dy)};
         num_steps = fabs(round(dy));
+        if (start.y < 0){
+            start_offset = -start.y;
+        }
     }
     else {
         step = (vec2){dx / fabs(dx), dy / fabs(dx)};
         num_steps = fabs(round(dx));
+        if (start.x < 0){
+            start_offset = -start.x;
+        }
     }
-    for (long s = 0; s < num_steps; s++){
+    for (long s = start_offset; s < num_steps; s++){
         vec2 position = vec2_add(start, vec2_mul(step, s));
+        // if the position is out of canvas, we are done
+        if (position.x < 0 || position.x >= img->width || position.y < 0 || position.y >= img->height){
+            break;
+        }
         draw_pixel(img, position, c);
     }
 }
