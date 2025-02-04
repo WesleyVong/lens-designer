@@ -31,10 +31,10 @@ def raytrace():
     r2d_file = open(r2d_path, 'w')
     r2d_file.write('IMAGE {} {} {} {}\n'.format(IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_SCALE, png_path))
     for i in np.linspace(450, 750, 5):
-        for j in np.linspace(-10, 10, 100):
+        for j in np.linspace(-10, 10, 10):
             r2d_file.write('RAY -100 {} 1 0 {} 1\n'.format(j, i))
 
-    num_lenses = len(l1)
+    num_lenses = len(lens_sel)
     for l in range(num_lenses):
         l = lens.Lens(lens_sel[l].get(), [e1_data[l].get(),e2_data[l].get()], cb_data[l].get())
         r2d_file.write(l.as_r2d())
@@ -46,51 +46,36 @@ def raytrace():
     render.image = png
 
 def add_lens():
-    num_lenses = len(l1) + 1
-    row_idx = num_lenses+1
-    l1.append(tk.Label(root, text='Lens:'))
-    l1[-1].grid(row=row_idx, column=0, sticky='w')
+    num_lenses = len(lens_sel) + 1
+    row_idx = num_lenses+2
     lens_sel.append(tk.StringVar())
     lens_sel[-1].set('LB1761')
     lens_dd.append(tk.Entry(root, textvariable=lens_sel[-1]))
-    lens_dd[-1].grid(row=row_idx, column=1)
-    l2.append(tk.Label(root, text='PosX:'))
-    l2[-1].grid(row=row_idx, column=2, sticky='w')
+    lens_dd[-1].grid(row=row_idx, column=0)
     e1_data.append(tk.DoubleVar())
     e1_data[-1].set(0)
     e1.append(tk.Entry(root, textvariable=e1_data[-1]))
-    e1[-1].grid(row=row_idx, column=3)
-    l3.append(tk.Label(root, text='PosY:'))
-    l3[-1].grid(row=row_idx, column=4, sticky='w')
+    e1[-1].grid(row=row_idx, column=1)
     e2_data.append(tk.DoubleVar())
     e2_data[-1].set(0)
     e2.append(tk.Entry(root, textvariable=e2_data[-1]))
-    e2[-1].grid(row=row_idx, column=5)
+    e2[-1].grid(row=row_idx, column=2)
     cb_data.append(tk.BooleanVar())
     cb_data[-1].set(False)
     cb.append(tk.Checkbutton(root, text='Reverse', variable=cb_data[-1]))
-    cb[-1].grid(row=row_idx, column=6, sticky='w')
+    cb[-1].grid(row=row_idx, column=3, sticky='w')
 
 def remove_lens():
-    num_lenses = len(l1)
+    num_lenses = len(lens_sel)
     if (num_lenses == 0):
         return
-    l1[-1].grid_remove()
-    l1[-1].destroy()
-    l1.pop()
     lens_sel.pop()
     lens_dd[-1].grid_remove()
     lens_dd[-1].destroy()
     lens_dd.pop()
-    l2[-1].grid_remove()
-    l2[-1].destroy()
-    l2.pop()
     e1_data.pop()
     e1[-1].destroy()
     e1.pop()
-    l3[-1].grid_remove()
-    l3[-1].destroy()
-    l3.pop()
     e2_data.pop()
     e2[-1].destroy()
     e2.pop()
@@ -99,7 +84,7 @@ def remove_lens():
     cb.pop()
 
 def save():
-    file_path = filedialog.asksaveasfilename(defaultextension=".r2d")
+    file_path = filedialog.asksaveasfilename(defaultextension=".json")
     if (file_path):
         with open(file_path, 'w') as f:
             lens_sel_arr = [x.get() for x in lens_sel]
@@ -109,7 +94,7 @@ def save():
             f.write(json.dumps([lens_sel_arr, e1_data_arr, e2_data_arr, cb_data_arr]))
 
 def load():
-    file_path = filedialog.askopenfilename(defaultextension=".r2d")
+    file_path = filedialog.askopenfilename(defaultextension=".json")
     if (file_path):
         with open(file_path, 'r') as f:
             data = json.load(f)
@@ -129,9 +114,6 @@ def load():
     raytrace()
 
 num_lenses = 0
-l1 = []
-l2 = []
-l3 = []
 lens_sel = []
 lens_dd = []
 e1_data = []
@@ -154,6 +136,15 @@ load_btn.grid(row=0, column=1, sticky='w')
 render = tk.Label(root, image=png)
 render.config(bg='black')
 render.grid(row=1, column=0, sticky='nw', columnspan=50)
+
+l1 = tk.Label(root, text='Lens')
+l1.grid(row=2, column=0, sticky='w')
+l2 = tk.Label(root, text='PosX')
+l2.grid(row=2, column=1, sticky='w')
+l3 = tk.Label(root, text='PosY')
+l3.grid(row=2, column=2, sticky='w')
+l4 = tk.Label(root, text='Direction')
+l4.grid(row=2, column=3, sticky='w')
 
 rt = tk.Button(root, text='Raytrace', command=raytrace)
 rt.grid(row=10, column=0, sticky='w')
