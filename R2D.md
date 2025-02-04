@@ -76,3 +76,7 @@ Takes 6 arguments
 | 4 | double | Ray direction Y |
 | 5 | double | Ray wavelength |
 | 6 | double | Ray intensity |
+
+### RAYTRACE
+
+Takes no arguments, raytraces the image

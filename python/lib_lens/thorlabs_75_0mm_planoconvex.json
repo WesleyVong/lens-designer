@@ -1,0 +1,50 @@
+{
+  "LA1740": {
+    "name": "LA1740",
+    "diameter": 75.0,
+    "r0": 43.8,
+    "k0": 0,
+    "a0": [],
+    "thickness": 24.2,
+    "material": "N-BK7",
+    "type": "planoconvex",
+    "focalLength": 84.7,
+      "description": "N-BK7 Plano-Convex Lens, Ø75mm\", f = 85 mm, Uncoated"
+  },
+  "LA1238": {
+    "name": "LA1238",
+    "diameter": 75.0,
+    "r0": 51.5,
+    "k0": 0,
+    "a0": [],
+    "thickness": 19.2,
+    "material": "N-BK7",
+    "type": "planoconvex",
+    "focalLength": 99.7,
+      "description": "N-BK7 Plano-Convex Lens, Ø75mm\", f = 100 mm, Uncoated"
+  },
+  "LA1002": {
+    "name": "LA1002",
+    "diameter": 75.0,
+    "r0": 77.3,
+    "k0": 0,
+    "a0": [],
+    "thickness": 12.7,
+    "material": "N-BK7",
+    "type": "planoconvex",
+    "focalLength": 149.5,
+      "description": "N-BK7 Plano-Convex Lens, Ø75mm\", f = 150 mm, Uncoated"
+  },
+  "LA1353": {
+    "name": "LA1353",
+    "diameter": 75.0,
+    "r0": 103.0,
+    "k0": 0,
+    "a0": [],
+    "thickness": 10.1,
+    "material": "N-BK7",
+    "type": "planoconvex",
+    "focalLength": 199.3,
+      "description": "N-BK7 Plano-Convex Lens, Ø75mm\", f = 200 mm, Uncoated"
+  }
+}

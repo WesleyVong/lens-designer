@@ -7,14 +7,14 @@ import numpy as np
 from tkinter import filedialog
 from PIL import Image, ImageTk
 
-CANVAS_WIDTH = 1000
+CANVAS_WIDTH = 800
 CANVAS_HEIGHT = 800
 
-IMAGE_WIDTH = 1000
+IMAGE_WIDTH = 800
 IMAGE_HEIGHT = 400
-IMAGE_ORIGIN_X = 500
+IMAGE_ORIGIN_X = 400
 IMAGE_ORIGIN_Y = 200
-IMAGE_SCALE = 1 / 80
+IMAGE_SCALE = 1 / 50
 IMAGE_NAME = 'program.png'
 
 dirname = os.path.dirname(__file__)
@@ -37,7 +37,7 @@ def raytrace():
     r2d_file = open(r2d_path, 'w')
     r2d_file.write('IMAGE {} {} {} {} {} {}\n'.format(IMAGE_WIDTH, IMAGE_HEIGHT, image_scale, image_origin_x, image_origin_y, png_path))
     for i in np.linspace(450, 750, 5):
-        for j in np.linspace(-10, 10, 10):
+        for j in np.linspace(-light_width_data.get()/2, light_width_data.get()/2, light_rays_data.get()):
             r2d_file.write('RAY -100 {} 1 0 {} 1\n'.format(j, i))
 
     num_lenses = len(lens_sel)
@@ -194,6 +194,12 @@ save_btn.grid(row=0, column=0, sticky='w')
 load_btn = tk.Button(header_controls, text='Load', command=load)
 load_btn.grid(row=0, column=1, sticky='w')
 
+render = tk.Label(root, image=png)
+render.config(bg='black')
+render.grid(row=1, column=0, sticky='nw', columnspan=50)
+render.bind('<MouseWheel>', on_render_scroll)
+render.bind('<Button-1>', on_render_click)
+
 image_controls = tk.Frame(root)
 image_controls.grid(row=2, column=0, sticky='w')
 
@@ -208,19 +214,32 @@ image_move_right_btn.grid(row=0, column=3, sticky='w')
 image_move_up_btn = tk.Button(image_controls, text='Move Up', command=render_move_up)
 image_move_up_btn.grid(row=0, column=4, sticky='w')
 image_move_down_btn = tk.Button(image_controls, text='Move Down', command=render_move_down)
-image_move_down_btn.grid(row=0, column=5, sticky='e')
+image_move_down_btn.grid(row=0, column=5, sticky='w')
 
-image_reset_btn = tk.Button(root, text='Reset Image', command=render_reset)
-image_reset_btn.grid(row=2, column=10, sticky='w')
+image_reset_btn = tk.Button(image_controls, text='Reset', command=render_reset)
+image_reset_btn.grid(row=0, column=10, sticky='w')
 
-render = tk.Label(root, image=png)
-render.config(bg='black')
-render.grid(row=1, column=0, sticky='nw', columnspan=50)
-render.bind('<MouseWheel>', on_render_scroll)
-render.bind('<Button-1>', on_render_click)
+light_controls = tk.Frame(root)
+light_controls.grid(row=3, column=0, sticky='w')
+
+light_width = tk.Label(light_controls, text='Light Width')
+light_width.grid(row=0, column=0, sticky='w')
+
+light_rays = tk.Label(light_controls, text='Light Rays')
+light_rays.grid(row=0, column=1, sticky='w')
+
+light_width_data = tk.DoubleVar()
+light_width_data.set(20)
+light_width_entry = tk.Entry(light_controls, textvariable=light_width_data)
+light_width_entry.grid(row=1, column=0)
+
+light_rays_data = tk.IntVar()
+light_rays_data.set(10)
+light_rays_entry = tk.Entry(light_controls, textvariable=light_rays_data)
+light_rays_entry.grid(row=1, column=1)
 
 lens_controls = tk.Frame(root)
-lens_controls.grid(row=3, column=0, sticky='w')
+lens_controls.grid(row=4, column=0, sticky='w')
 
 l1 = tk.Label(lens_controls, text='Lens')
 l1.grid(row=0, column=0, sticky='w')

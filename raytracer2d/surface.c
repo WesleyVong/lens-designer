@@ -52,7 +52,11 @@ Intersection2d line_intersection(void * obj, Ray2d * r){
     if (rt < 0){
         return i;
     }
-    lt = (r->origin.x + r->direction.x * rt - l->origin.x) / l->direction.x;
+    if (l->direction.x == 0){
+        lt = (r->origin.y + r->direction.y * rt - l->origin.y) / l->direction.y;
+    } else {
+        lt = (r->origin.x + r->direction.x * rt - l->origin.x) / l->direction.x;
+    }
     if (lt < -(l->length/2) || lt > (l->length/2)){
         return i;
     }

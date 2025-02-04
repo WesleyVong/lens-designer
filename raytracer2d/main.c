@@ -36,7 +36,6 @@ int main(int argc, char ** argv){
     stopwatch_print_reset(se, "Draw Time");
 
     lodepng_encode32_file(img->name, img->image, img->width, img->height);
-    printf("Wrote image to %s\n", img->name);
     stopwatch_print_reset(se, "Encode Time");
 
     raytracer2d_free_all(rt);
