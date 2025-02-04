@@ -1,6 +1,15 @@
 #include "surface.h"
 #include "stdlib.h"
+#define _USE_MATH_DEFINES
 #include "math.h"
+
+double constrain_angle(double angle){
+    angle = fmod(angle, 2 * M_PI);
+    if (angle < 0){
+        angle += 2 * M_PI;
+    }
+    return angle;
+}
 
 Line * line_init(vec2 origin, vec2 direction, double length){
     Line * l = malloc(sizeof(Line));
@@ -126,9 +135,16 @@ Intersection2d arc_intersection(void * obj, Ray2d * r){
     i.type = INTERSECT_VALID;
     i.point = vec2_add(r->origin, vec2_mul(r->direction, i.distance));
     double angle = vec2_angle(vec2_sub(i.point, a->origin), (vec2){1,0});    // Get angle of intersection
-    // If angle is outside of arc, return no intersection
+    // If angle is outside of arc
     if (angle < a->start_angle || angle > a->end_angle){
-        i.type = INTERSECT_NONE;
+        // See if it is because we are intersecting the other side of the circle
+        vec2 second_ray_pos = vec2_add(i.point, vec2_mul(r->direction, 0.001)); // Move the ray slightly to avoid self intersection
+        Ray2d * second_ray = ray2d_init(RAY_PRIMARY, second_ray_pos, r->direction, r->wavelength, r->intensity, NULL);
+        Intersection2d second_intersection = arc_intersection(obj, second_ray);
+        i.type = second_intersection.type;
+        i.point = second_intersection.point;
+        i.distance = i.distance + second_intersection.distance;
+        i.normal = second_intersection.normal;
         return i;
     }
     i.normal = vec2_normalize(vec2_sub(i.point, a->origin));

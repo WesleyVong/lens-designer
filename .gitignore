@@ -3,4 +3,6 @@
 *.obj
 *.pdb
 *.png
+*.r2d
+python/__pycache__/*
 misc/optical_constants.csv
