@@ -66,6 +66,14 @@ Command * parse_line(char * line){
                         *(double *)cmd->args[cmd->num_args-1] = strtod(token, NULL);
                         break;
                     case 3:
+                        cmd->args[cmd->num_args-1] = (void *)malloc(sizeof(double));
+                        *(double *)cmd->args[cmd->num_args-1] = strtod(token, NULL);
+                        break;
+                    case 4:
+                        cmd->args[cmd->num_args-1] = (void *)malloc(sizeof(double));
+                        *(double *)cmd->args[cmd->num_args-1] = strtod(token, NULL);
+                        break;
+                    case 5:
                         cmd->args[cmd->num_args-1] = (void *)malloc(strlen(token) * sizeof(char));
                         strcpy((char *)cmd->args[cmd->num_args-1], token);
                         break;
@@ -139,8 +147,13 @@ void parse_file(char * fname, Image ** img, Raytracer2d ** rt){
                     double image_scale = *(double *)cmd->args[2];
                     (*img)->scale = image_scale;
                 }
-                if (cmd->num_args >= 4){
-                    char * image_name = (char *)cmd->args[3];
+                if (cmd->num_args >= 5){
+                    double image_x_offset = *(double *)cmd->args[3];
+                    double image_y_offset = *(double *)cmd->args[4];
+                    (*img)->origin = (vec2){image_x_offset, image_y_offset};
+                }
+                if (cmd->num_args >= 6){
+                    char * image_name = (char *)cmd->args[5];
                     (*img)->name = malloc(strlen(image_name) * sizeof(char));
                     strcpy((*img)->name, image_name);
                 }

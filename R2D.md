@@ -8,14 +8,16 @@ Command Arg1 Arg2 ... ArgN
 
 ### IMAGE
 
-Takes 2-4 arguments
+Takes 2-6 arguments
 
 | Argument | Type | Description |
 | --- | --- | --- |
 | 1 | int | Width of the image |
 | 2 | int | Height of the image |
 | 3 | double | Scale of the image |
-| 4 | string | Name of the image |
+| 4 | int | X Offset of the image |
+| 5 | int | Y Offset of the image |
+| 6 | string | Name of the image |
 
 ### IOR
 

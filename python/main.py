@@ -12,6 +12,8 @@ CANVAS_HEIGHT = 800
 
 IMAGE_WIDTH = 1000
 IMAGE_HEIGHT = 400
+IMAGE_ORIGIN_X = 500
+IMAGE_ORIGIN_Y = 200
 IMAGE_SCALE = 1 / 80
 IMAGE_NAME = 'program.png'
 
@@ -27,9 +29,13 @@ root.pack_propagate(False)
 
 png = ImageTk.PhotoImage(Image.open(png_path))
 
+image_scale = IMAGE_SCALE
+image_origin_x = IMAGE_ORIGIN_X
+image_origin_y = IMAGE_ORIGIN_Y
+
 def raytrace():
     r2d_file = open(r2d_path, 'w')
-    r2d_file.write('IMAGE {} {} {} {}\n'.format(IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_SCALE, png_path))
+    r2d_file.write('IMAGE {} {} {} {} {} {}\n'.format(IMAGE_WIDTH, IMAGE_HEIGHT, image_scale, image_origin_x, image_origin_y, png_path))
     for i in np.linspace(450, 750, 5):
         for j in np.linspace(-10, 10, 10):
             r2d_file.write('RAY -100 {} 1 0 {} 1\n'.format(j, i))
@@ -46,23 +52,24 @@ def raytrace():
     render.image = png
 
 def add_lens():
+    global lens_controls
     num_lenses = len(lens_sel) + 1
-    row_idx = num_lenses+2
+    row_idx = num_lenses
     lens_sel.append(tk.StringVar())
     lens_sel[-1].set('LB1761')
-    lens_dd.append(tk.Entry(root, textvariable=lens_sel[-1]))
+    lens_dd.append(tk.Entry(lens_controls, textvariable=lens_sel[-1]))
     lens_dd[-1].grid(row=row_idx, column=0)
     e1_data.append(tk.DoubleVar())
     e1_data[-1].set(0)
-    e1.append(tk.Entry(root, textvariable=e1_data[-1]))
+    e1.append(tk.Entry(lens_controls, textvariable=e1_data[-1]))
     e1[-1].grid(row=row_idx, column=1)
     e2_data.append(tk.DoubleVar())
     e2_data[-1].set(0)
-    e2.append(tk.Entry(root, textvariable=e2_data[-1]))
+    e2.append(tk.Entry(lens_controls, textvariable=e2_data[-1]))
     e2[-1].grid(row=row_idx, column=2)
     cb_data.append(tk.BooleanVar())
     cb_data[-1].set(False)
-    cb.append(tk.Checkbutton(root, text='Reverse', variable=cb_data[-1]))
+    cb.append(tk.Checkbutton(lens_controls, text='Reverse', variable=cb_data[-1]))
     cb[-1].grid(row=row_idx, column=3, sticky='w')
 
 def remove_lens():
@@ -113,6 +120,59 @@ def load():
                 cb_data[i].set(cb_data_arr[i])
     raytrace()
 
+def render_zoom_in():
+    global image_scale
+    image_scale *= 1.25
+    raytrace()
+
+def render_zoom_out():
+    global image_scale
+    image_scale /= 1.25
+    raytrace()
+
+def render_move_left():
+    global image_origin_x
+    image_origin_x += 50
+    raytrace()
+
+def render_move_right():
+    global image_origin_x
+    image_origin_x -= 50
+    raytrace()
+
+def render_move_up():
+    global image_origin_y
+    image_origin_y += 50
+    raytrace()
+
+def render_move_down():
+    global image_origin_y
+    image_origin_y -= 50
+    raytrace()
+
+def on_render_scroll(e):
+    global image_scale
+    if (e.delta > 0):
+        image_scale *= e.delta / 120 * 1.25
+    else:
+        image_scale /= -e.delta / 120 * 1.25
+    raytrace()
+
+def on_render_click(e):
+    global image_origin_x, image_origin_y
+    dx = e.x - IMAGE_ORIGIN_X
+    dy = e.y - IMAGE_ORIGIN_Y
+    image_origin_x -= dx
+    image_origin_y -= dy
+    raytrace()
+
+def render_reset():
+    global image_scale, image_origin_x, image_origin_y
+    image_scale = IMAGE_SCALE
+    image_origin_x = IMAGE_ORIGIN_X
+    image_origin_y = IMAGE_ORIGIN_Y
+    raytrace()
+
 num_lenses = 0
 lens_sel = []
 lens_dd = []
@@ -125,35 +185,63 @@ cb = []
 
 lens_options = list(lens.get_lens_keys())
 
-add_lens()
+header_controls = tk.Frame(root)
+header_controls.grid(row=0, column=0, sticky='w')
 
-save_btn = tk.Button(root, text='Save', command=save)
+save_btn = tk.Button(header_controls, text='Save', command=save)
 save_btn.grid(row=0, column=0, sticky='w')
 
-load_btn = tk.Button(root, text='Load', command=load)
+load_btn = tk.Button(header_controls, text='Load', command=load)
 load_btn.grid(row=0, column=1, sticky='w')
+
+image_controls = tk.Frame(root)
+image_controls.grid(row=2, column=0, sticky='w')
+
+image_zoom_in_btn = tk.Button(image_controls, text='Zoom In', command=render_zoom_in)
+image_zoom_in_btn.grid(row=0, column=0, sticky='w')
+image_zoom_out_btn = tk.Button(image_controls, text='Zoom Out', command=render_zoom_out)
+image_zoom_out_btn.grid(row=0, column=1, sticky='w')
+image_move_left_btn = tk.Button(image_controls, text='Move Left', command=render_move_left)
+image_move_left_btn.grid(row=0, column=2, sticky='w')
+image_move_right_btn = tk.Button(image_controls, text='Move Right', command=render_move_right)
+image_move_right_btn.grid(row=0, column=3, sticky='w')
+image_move_up_btn = tk.Button(image_controls, text='Move Up', command=render_move_up)
+image_move_up_btn.grid(row=0, column=4, sticky='w')
+image_move_down_btn = tk.Button(image_controls, text='Move Down', command=render_move_down)
+image_move_down_btn.grid(row=0, column=5, sticky='e')
+
+image_reset_btn = tk.Button(root, text='Reset Image', command=render_reset)
+image_reset_btn.grid(row=2, column=10, sticky='w')
 
 render = tk.Label(root, image=png)
 render.config(bg='black')
 render.grid(row=1, column=0, sticky='nw', columnspan=50)
+render.bind('<MouseWheel>', on_render_scroll)
+render.bind('<Button-1>', on_render_click)
 
-l1 = tk.Label(root, text='Lens')
-l1.grid(row=2, column=0, sticky='w')
-l2 = tk.Label(root, text='PosX')
-l2.grid(row=2, column=1, sticky='w')
-l3 = tk.Label(root, text='PosY')
-l3.grid(row=2, column=2, sticky='w')
-l4 = tk.Label(root, text='Direction')
-l4.grid(row=2, column=3, sticky='w')
+lens_controls = tk.Frame(root)
+lens_controls.grid(row=3, column=0, sticky='w')
 
-rt = tk.Button(root, text='Raytrace', command=raytrace)
-rt.grid(row=10, column=0, sticky='w')
+l1 = tk.Label(lens_controls, text='Lens')
+l1.grid(row=0, column=0, sticky='w')
+l2 = tk.Label(lens_controls, text='PosX')
+l2.grid(row=0, column=1, sticky='w')
+l3 = tk.Label(lens_controls, text='PosY')
+l3.grid(row=0, column=2, sticky='w')
+l4 = tk.Label(lens_controls, text='Direction')
+l4.grid(row=0, column=3, sticky='w')
 
-add = tk.Button(root, text='Add Lens', command=add_lens)
-add.grid(row=10, column=1)
+rt = tk.Button(lens_controls, text='Raytrace', command=raytrace)
+rt.grid(row=100, column=0, sticky='w')
 
-sub = tk.Button(root, text='Remove Lens', command=remove_lens)
-sub.grid(row=10, column=2)
+add = tk.Button(lens_controls, text='Add Lens', command=add_lens)
+add.grid(row=100, column=1)
+
+sub = tk.Button(lens_controls, text='Remove Lens', command=remove_lens)
+sub.grid(row=100, column=2)
+
+
+add_lens()
     
 raytrace()
 

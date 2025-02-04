@@ -169,7 +169,7 @@ void draw_line(Image *img, vec2 start, vec2 end, Color c){
             start_offset = -start.x;
         }
     }
-    for (long s = start_offset; s < num_steps; s++){
+    for (long s = start_offset+1; s < num_steps; s++){
         vec2 position = vec2_add(start, vec2_mul(step, s));
         // if the position is out of canvas, we are done
         if (position.x < 0 || position.x >= img->width || position.y < 0 || position.y >= img->height){

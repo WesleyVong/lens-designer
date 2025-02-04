@@ -24,7 +24,6 @@ int main(int argc, char ** argv){
 
     // parse_file("test_script.r2d", &img, &rt);
 
-    // img->origin = (vec2){img->width / 4, img->height / 2};
     img->color_space = COLOR_LINEAR;
 
     if (img->name == NULL){
